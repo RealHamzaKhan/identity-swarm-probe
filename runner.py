@@ -126,8 +126,18 @@ def main():
                         page.mouse.move(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2,
                                         steps=plan["mouse_steps"])
                     el.click(timeout=20000)
+                elif do == "click_text":
+                    el = page.get_by_text(step["text"]).first
+                    box = el.bounding_box()
+                    if box:
+                        page.mouse.move(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2,
+                                        steps=plan["mouse_steps"])
+                    el.click(timeout=20000)
                 elif do == "fill":
                     page.locator(step["selector"]).first.type(step["text"], delay=plan["typing_delay_ms"])
+                elif do == "fill_placeholder":
+                    page.get_by_placeholder(step["placeholder"]).first.type(
+                        step["text"], delay=plan["typing_delay_ms"])
                 elif do == "press":
                     page.keyboard.press(step["key"])
                 elif do == "wait":

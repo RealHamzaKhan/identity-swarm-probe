@@ -12,25 +12,40 @@ import json, random, sys
 
 VIEWPORTS = [
     {"width": 1920, "height": 1080},
+    {"width": 1920, "height": 1200},
     {"width": 1680, "height": 1050},
     {"width": 1600, "height": 900},
+    {"width": 1600, "height": 1200},
     {"width": 1536, "height": 864},
     {"width": 1440, "height": 900},
     {"width": 1366, "height": 768},
     {"width": 1280, "height": 720},
+    {"width": 1280, "height": 1024},
     {"width": 1024, "height": 768},
+    {"width": 1152, "height": 864},
 ]
+SCALES = [1, 1.25, 1.5, 2]
+SCHEMES = ["light", "dark", "no-preference"]
+
+def combo_deck(seed: str):
+    """All screen combos, shuffled by the seed. Dealt like cards:
+    no combo repeats until every combo has been used once.
+    12 viewports x 4 scales x 3 schemes = 144 combos, enough for 100 users."""
+    deck = [(v, s, c) for v in VIEWPORTS for s in SCALES for c in SCHEMES]
+    random.Random(f"swarm-deck-{seed}").shuffle(deck)
+    return deck
 
 def make_plan(seed: str, index: int) -> dict:
     rng = random.Random(f"swarm-{seed}-{index}")
-    viewport = rng.choice(VIEWPORTS)
+    deck = combo_deck(seed)
+    viewport, scale, scheme = deck[(index - 1) % len(deck)]
     return {
         "index": index,
         "seed": str(seed),
         "start_delay_s": round(rng.uniform(0, 90), 1),
         "viewport": viewport,
-        "device_scale_factor": rng.choice([1, 1, 1, 1.25, 1.5]),
-        "color_scheme": rng.choice(["light", "light", "dark", "no-preference"]),
+        "device_scale_factor": scale,
+        "color_scheme": scheme,
         "typing_delay_ms": rng.randint(40, 150),
         "wait_multiplier": round(rng.uniform(0.7, 1.7), 2),
         "scroll_px": rng.randint(280, 900),
