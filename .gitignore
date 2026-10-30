@@ -3,3 +3,7 @@ summary.json
 summary.md
 artifacts/
 __pycache__/
+out/
+run-results/
+artifacts/
+swarm-summary.*
