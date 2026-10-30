@@ -1,0 +1,73 @@
+name: Identity Swarm
+
+on:
+  workflow_dispatch:
+    inputs:
+      users:
+        description: "Number of users (1 to 100)"
+        required: true
+        default: "5"
+      seed:
+        description: "Run seed: same seed repeats the same plans"
+        required: true
+        default: "demo1"
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.m.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: m
+        run: echo "matrix=$(python3 make_matrix.py '${{ inputs.users }}')" >> "$GITHUB_OUTPUT"
+
+  swarm:
+    needs: prepare
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install browser
+        run: |
+          pip install playwright
+          playwright install --with-deps chromium
+      - name: Run this user
+        run: python3 runner.py --index ${{ matrix.index }} --seed '${{ inputs.seed }}' --task task.json
+      - name: Upload this user result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: swarm-${{ matrix.index }}
+          path: out/
+          retention-days: 7
+
+  collect:
+    needs: swarm
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download all user results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: swarm-*
+          path: artifacts
+      - name: Build summary
+        run: |
+          python3 collect_swarm.py artifacts
+          cat swarm-summary.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: swarm-summary
+          path: |
+            swarm-summary.json
+            swarm-summary.md
+          retention-days: 7
