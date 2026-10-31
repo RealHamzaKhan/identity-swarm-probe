@@ -88,7 +88,7 @@ def main():
     task = dict(task, steps=resolve_steps(task, args.index))
     out = {"index": args.index, "plan": plan, "task_name": task.get("name"),
            "started_utc": datetime.now(timezone.utc).isoformat(),
-           "steps_done": [], "status": "running"}
+           "steps_done": [], "checks": [], "status": "running"}
     out_dir = Path("out"); out_dir.mkdir(exist_ok=True)
 
     if not args.no_delay and plan["start_delay_s"]:
@@ -147,6 +147,20 @@ def main():
                 elif do == "scroll":
                     page.mouse.wheel(0, plan["scroll_px"])
                     page.wait_for_timeout(600 * plan["wait_multiplier"])
+                elif do == "verify_playing":
+                    probe = "() => { const v = document.querySelector('video, audio'); return v ? {t: v.currentTime, paused: v.paused, ready: v.readyState} : null; }"
+                    first = page.evaluate(probe)
+                    if first is None:
+                        out["checks"].append({"type": "verify_playing", "ok": False, "reason": "no video element on page"})
+                        raise RuntimeError("verify_playing: no video element on page")
+                    page.wait_for_timeout(step.get("seconds", 12) * 1000)
+                    second = page.evaluate(probe)
+                    ok = bool(second and second["t"] > first["t"] + 2 and not second["paused"])
+                    out["checks"].append({"type": "verify_playing", "ok": ok,
+                                          "t_start": first["t"], "t_end": second["t"] if second else None,
+                                          "paused_at_end": second["paused"] if second else None})
+                    if not ok:
+                        raise RuntimeError(f"verify_playing: video time did not advance ({first['t']} to {second['t'] if second else None})")
                 elif do == "play_media":
                     page.evaluate("() => { const m = document.querySelector('video, audio'); if (m) return m.play(); }")
                     page.wait_for_timeout(step.get("seconds", 30) * 1000 * plan["media_wait_multiplier"])
@@ -168,6 +182,10 @@ def main():
                 page.wait_for_timeout(next(pauses) * 1000)
             out["final_url"] = page.url
             out["final_title"] = page.title()
+            try:
+                out["page_text_start"] = page.evaluate("() => document.body ? document.body.innerText.slice(0, 600) : ''")
+            except Exception:
+                out["page_text_start"] = None
             out["fingerprint"] = page.evaluate(FINGERPRINT_JS)
             page.screenshot(path=str(out_dir / "final.png"), full_page=True)
             browser.close()

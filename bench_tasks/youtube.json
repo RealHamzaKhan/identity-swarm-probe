@@ -1,0 +1,1 @@
+{"name":"BENCH YouTube: search public term, open a result, prove it plays","steps":[{"do":"goto","url":"https://www.youtube.com/results?search_query=lofi+music"},{"do":"wait","seconds":4},{"alts":[{"do":"click","selector":"#video-title-link"}],"do":"click","selector":"a#video-title"},{"do":"wait","seconds":3},{"do":"verify_playing","seconds":12}]}

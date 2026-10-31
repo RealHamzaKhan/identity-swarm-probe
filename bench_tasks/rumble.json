@@ -1,0 +1,1 @@
+{"name":"BENCH Rumble: open a public video from home, prove it plays","steps":[{"do":"goto","url":"https://rumble.com/"},{"do":"wait","seconds":4},{"do":"click","selector":"a[href^=\"/v\"]"},{"do":"wait","seconds":3},{"do":"verify_playing","seconds":12}]}

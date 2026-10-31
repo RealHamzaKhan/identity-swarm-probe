@@ -20,7 +20,7 @@ ALLOWED = {
     "goto": ["url"], "click": ["selector"], "click_text": ["text"],
     "fill": ["selector", "text"], "fill_placeholder": ["placeholder", "text"],
     "press": ["key"], "wait": ["seconds"], "scroll": [],
-    "play_media": [], "download": ["selector"], "noop": [],
+    "play_media": [], "download": ["selector"], "noop": [], "verify_playing": [],
 }
 
 def validate_task(task) -> list:
