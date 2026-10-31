@@ -1,1 +1,1 @@
-{"name":"BENCH Rumble: open a public video from home, prove it plays","steps":[{"do":"goto","url":"https://rumble.com/"},{"do":"wait","seconds":4},{"do":"click","selector":"a[href^=\"/v\"]"},{"do":"wait","seconds":3},{"do":"verify_playing","seconds":12}]}
+{"name":"BENCH Spotify: search, try to play, record the wall or the pass","steps":[{"do":"goto","url":"https://open.spotify.com/search/lofi"},{"do":"wait","seconds":5},{"do":"scroll"},{"do":"play_media","seconds":5},{"do":"verify_playing","seconds":8}]}
