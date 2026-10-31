@@ -20,6 +20,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 from planner import make_plan
+from variant_planner import resolve_steps
 
 def fetch_json(url, timeout=15):
     req = urllib.request.Request(url, headers={"User-Agent": "identity-swarm/1.0"})
@@ -84,6 +85,7 @@ def main():
 
     plan = make_plan(args.seed, args.index)
     task = json.loads(Path(args.task).read_text())
+    task = dict(task, steps=resolve_steps(task, args.index))
     out = {"index": args.index, "plan": plan, "task_name": task.get("name"),
            "started_utc": datetime.now(timezone.utc).isoformat(),
            "steps_done": [], "status": "running"}
@@ -158,6 +160,8 @@ def main():
                     data = path.read_bytes()
                     out["download"] = {"name": d.suggested_filename, "bytes": len(data),
                                         "sha256": hashlib.sha256(data).hexdigest()}
+                elif do == "noop":
+                    pass
                 else:
                     raise ValueError(f"unknown step: {do}")
                 out["steps_done"].append(do)
