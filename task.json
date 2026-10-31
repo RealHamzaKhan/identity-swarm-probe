@@ -1,1 +1,1 @@
-{"name":"BENCH Spotify: search, try to play, record the wall or the pass","steps":[{"do":"goto","url":"https://open.spotify.com/search/lofi"},{"do":"wait","seconds":5},{"do":"scroll"},{"do":"play_media","seconds":5},{"do":"verify_playing","seconds":8}]}
+{"name":"demo task: open example.com and click Learn more","steps":[{"do":"goto","url":"https://example.com/"},{"do":"wait","seconds":2},{"do":"scroll"},{"do":"click","selector":"a"},{"do":"wait","seconds":2}]}
