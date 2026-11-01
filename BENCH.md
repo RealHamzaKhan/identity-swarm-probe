@@ -48,3 +48,44 @@ Big instrumentation gap (ours):
 
 Score today, plain: 0 of 60 verified plays. The fleet, IPs, variants, and reporting work.
 The site tasks and failure evidence do not. That is what v2 fixes.
+
+---
+
+# Functional Benchmark v2 (2026-11-01)
+
+Fixes from v1 were applied first:
+- Runner now saves screenshot, page text, final URL and fingerprint on FAILURE too.
+- New scout step `dump_links` records live page structure (links, buttons, inputs, media).
+- New `click_media` step: a normal click on the video element.
+- Each site was scouted with 1 user before the 20 user run.
+
+## Scout findings (1 user each, all proven from live page data)
+
+YouTube: search works, result links are `a#video-title`. Watch page text says:
+"Sign in to confirm you're not a bot. This helps protect our community."
+Video element: readyState 0, paused, time 0. The player never loads media.
+
+Rumble: home page is a Cloudflare challenge, title "Just a moment...",
+text "Performing security verification... verifies you are not a bot", with a Ray ID.
+No video links exist on that page. The v1 selector was never the main problem.
+
+Spotify: search works, no block. Track links are `a[href^="/track/"]`.
+No media element exists until play is pressed.
+
+## v2 results (20 users per site, unique IPs 20/20 in every run)
+
+| Site | Passed | Proven reason |
+|------|--------|---------------|
+| YouTube | 0/20 | All 20 reached the watch page and clicked the player. All 20 pages carried the bot check text. Media time stayed 0. Site block, proven from page text. Run 41300247718 |
+| Rumble | 0/20 | All 20 got the Cloudflare security verification page. Site challenge, proven from page text. Run 41300667984 |
+| Spotify v2 | 0/20 | All 20 opened a track. The play button existed in the page but was "not visible", so clicks timed out. Run 41301112098 |
+| Spotify v3 (scroll fix) | 0/20 | Scroll made the play button visible, all 20 clicked it. Spotify answered by adding `#login` to the URL and creating no media. Login wall at play, proven. Run 41301543257 |
+
+## What v2 proves
+
+The v1 score (0/60) mixed our faults with site defenses. v2 separates them:
+- Our v1 faults are fixed: selectors, play steps, track click, failure evidence.
+- What remains is site side, with evidence per user: YouTube bot check,
+  Rumble Cloudflare challenge, Spotify login wall.
+- A testing tool's honest job on such sites is to measure and report this.
+  Defeating these checks is a different activity and is not part of this system.
