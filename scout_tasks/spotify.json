@@ -1,0 +1,1 @@
+{"name":"SCOUT Spotify: search page structure","steps":[{"do":"goto","url":"https://open.spotify.com/search/lofi"},{"do":"wait","seconds":6},{"do":"dump_links"},{"do":"scroll"},{"do":"dump_links"}]}

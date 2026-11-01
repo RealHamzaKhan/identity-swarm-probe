@@ -21,6 +21,7 @@ ALLOWED = {
     "fill": ["selector", "text"], "fill_placeholder": ["placeholder", "text"],
     "press": ["key"], "wait": ["seconds"], "scroll": [],
     "play_media": [], "download": ["selector"], "noop": [], "verify_playing": [],
+    "dump_links": [], "click_media": [],
 }
 
 def validate_task(task) -> list:
