@@ -5,7 +5,14 @@ import json, sys
 from pathlib import Path
 from collections import Counter
 
-def category(err: str) -> str:
+def category(err: str, row=None) -> str:
+    text = ((row or {}).get("page_text_start") or "").lower()
+    if "confirm you" in text and "not a bot" in text:
+        return "SITE BOT CHECK: sign in to confirm you are not a bot (proven from page text)"
+    if "security verification" in text or "just a moment" in text:
+        return "SITE CHALLENGE: Cloudflare security verification page (proven from page text)"
+    if "log in" in text and "no media element" in (err or "").lower():
+        return "LOGIN WALL: page asks to log in, no media element (proven from page text)"
     e = (err or "").lower()
     if "no video element" in e: return "no media element (login wall or no player)"
     if "did not advance" in e: return "media present but not playing"
@@ -28,7 +35,7 @@ def main():
     passed = [r for r in rows if r.get("status") == "passed"]
     vok = sum(1 for r in rows for c in r.get("checks", []) if c.get("type") == "verify_playing" and c.get("ok"))
     ips = [r["ip"] for r in rows if r.get("ip")]
-    fails = Counter(category(r.get("error", "")) for r in rows if r.get("status") != "passed")
+    fails = Counter(category(r.get("error", ""), r) for r in rows if r.get("status") != "passed")
     print(f"total {len(rows)}  passed {len(passed)}  failed {len(rows)-len(passed)}")
     print(f"verify_playing ok: {vok}")
     print(f"unique IPs: {len(set(ips))}")

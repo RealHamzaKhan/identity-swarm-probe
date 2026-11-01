@@ -1,1 +1,1 @@
-{"name":"SCOUT Spotify: search page structure","steps":[{"do":"goto","url":"https://open.spotify.com/search/lofi"},{"do":"wait","seconds":6},{"do":"dump_links"},{"do":"scroll"},{"do":"dump_links"}]}
+{"name":"BENCH v2 YouTube: search, open result, click player, verify playing","steps":[{"do":"goto","url":"https://www.youtube.com/results?search_query=lofi+music"},{"do":"wait","seconds":4},{"do":"click","selector":"a#video-title"},{"do":"wait","seconds":3},{"do":"click_media"},{"do":"verify_playing","seconds":10}]}

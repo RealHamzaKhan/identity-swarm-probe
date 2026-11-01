@@ -1,0 +1,1 @@
+{"name":"BENCH v2 Rumble: home, record page state, open a video, verify playing","steps":[{"do":"goto","url":"https://rumble.com/"},{"do":"wait","seconds":8},{"do":"dump_links"},{"do":"click","selector":"a[href*=\"/v\"]"},{"do":"wait","seconds":3},{"do":"click_media"},{"do":"verify_playing","seconds":10}]}
