@@ -1,1 +1,1 @@
-{"name":"SCOUT YouTube: search page and watch page structure","steps":[{"do":"goto","url":"https://www.youtube.com/results?search_query=lofi+music"},{"do":"wait","seconds":5},{"do":"dump_links"},{"do":"click","selector":"a#video-title"},{"do":"wait","seconds":4},{"do":"dump_links"},{"do":"click_media"},{"do":"wait","seconds":2},{"do":"dump_links"}]}
+{"name":"SCOUT Rumble: home page structure","steps":[{"do":"goto","url":"https://rumble.com/"},{"do":"wait","seconds":5},{"do":"dump_links"},{"do":"scroll"},{"do":"dump_links"}]}
